@@ -3,6 +3,7 @@
 /etc/logs/*
 /etc/cache/*
 /etc/tmp/*
+/nbproject/*
 
 
 # Ignore context specific files
