@@ -6,6 +6,6 @@
 			),
 		'steps' => array
 			(
-				// empty
+				'tfinsights:items-base' => [ 'serial' => '1:0-default' ],
 			),
 	);

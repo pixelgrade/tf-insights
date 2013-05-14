@@ -1,21 +1,18 @@
-<?php namespace curteascolii;
+<?php namespace tfinsights\items;
 
 /* This file is property of PixelGrade. You may NOT copy, or redistribute it.
  * Please see the license that came with your copy for more information.
  */
 
-// Include the library
-include('vendor/simple_html_dom.php');
-
 /**
- * @package    curteascolii
+ * @package    tfinsights
  * @category   Task
  * @author     PixelGrade
- * @copyright  (c) 2012, PixelGrade Team
+ * @copyright  (c) 2013, PixelGrade Team
  */
-class Task_Grab_Video extends \app\Task
+class Task_Crawl_Items extends \app\Task
 {
-	function grab_videos_animekage($target)
+	function grab_items($target)
 	{
 		//get the parameters
 		$category = $this->config['category'];
@@ -369,7 +366,7 @@ class Task_Grab_Video extends \app\Task
 			\define('PUBDIR', \trim(\file_get_contents(DOCROOT.'pubdir')));
 		}
 		
-		$this->grab_videos_animekage($target);
+		$this->grab_items($target);
 	}
 
 } # class

@@ -5,6 +5,7 @@
 		'modules' => array
 			(
 				// project modules
+				$modpath.'tfitems'    => 'tfinsights\items',
 
 			// ---- Plugins ---------------------------------------------------
 
@@ -43,7 +44,7 @@
 				// explicit themes; themes can also just be embeded in modules,
 				// in which case there's no need for them to appear here.
 
-				'demo-theme' => $syspath.'themes/tfinsights/',
+				'main-theme' => $syspath.'themes/tfinsights/',
 			),
 
 	); # config
