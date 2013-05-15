@@ -36,8 +36,8 @@ class Task_Grab_Sales extends \app\Task_Base
 			}
 			$counter++;
 			
-			//wait every 50 items
-			if ($counter % 50 == 0)
+			//wait every 30 items
+			if ($counter % 30 == 0)
 			{
 				//$this->writer->printf('status','#', 'Waiting 5 seconds .... ')->eol();
 				\sleep(5);
