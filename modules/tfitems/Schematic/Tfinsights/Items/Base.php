@@ -31,17 +31,18 @@ class Schematic_Tfinsights_Items_Base extends \app\Instantiatable implements \mj
 			(
 				\app\Model_Item::table(), 
 				'
-					`id`           :key_primary,
-					`userid`	   :key_foreign,
-					`category`     :key_foreign,
-					`title`        varchar(1000) DEFAULT \'\',
-					`url`          varchar(1000) DEFAULT \'\',
-					`cost`		   :counter,
-					`rating`       :counter DEFAULT \'0\',
-					`thumbnail`    varchar(1000) DEFAULT \'\',
-					`tags`         varchar(1500) DEFAULT \'\',
-					`uploaded_on`  :datetime_optional,
-					`last_update`  :datetime_optional,
+					`id`			:key_primary,
+					`userid`		:key_foreign,
+					`category`		:key_foreign,
+					`item`			varchar(1000) DEFAULT \'\',
+					`url`			varchar(1000) DEFAULT \'\',
+					`live_preview_url`          varchar(1000) DEFAULT \'\',
+					`cost`			:counter,
+					`rating`		:counter DEFAULT \'0\',
+					`thumbnail`		varchar(1000) DEFAULT \'\',
+					`tags`			varchar(1500) DEFAULT \'\',
+					`uploaded_on`	:datetime_optional,
+					`last_update`	:datetime_optional,
 					
 					PRIMARY KEY (`id`)
 				'
@@ -67,10 +68,10 @@ class Schematic_Tfinsights_Items_Base extends \app\Instantiatable implements \mj
 			(
 				\app\Model_ItemCategory::table(), 
 				'
-					`id`          :key_primary,
-					`title`       :title,
-					`slug`        varchar(200) DEFAULT \'\',
-					`url`         varchar(1000) DEFAULT \'\',
+					`id`			:key_primary,
+					`parent_id`		BIGINT(20) DEFAULT NULL,
+					`title`			:title,
+					`slug`			varchar(200) DEFAULT \'\',
 					
 					PRIMARY KEY (`id`)
 				'

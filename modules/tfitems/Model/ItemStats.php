@@ -17,6 +17,22 @@ class Model_ItemStats
 	 * @var string
 	 */
 	protected static $table = 'pxg_itemstats';
+	
+	protected static $fieldlist = array
+		(
+			'nums' => array
+				(
+					'itemid', 'sales', 
+				),
+			'strs' => array
+				(
+					
+				),
+			'bools' => array
+				(
+				
+				),
+		);
 
 	/**
 	 * @return string table
@@ -37,7 +53,13 @@ class Model_ItemStats
 	// -------------------------------------------------------------------------
 	// factory interface
 	
-	
+	static function process(array $fields)
+	{
+		static::inserter($fields, static::$fieldlist['strs'], static::$fieldlist['bools'], static::$fieldlist['nums'])->run();
+		static::$last_inserted_id = \app\SQL::last_inserted_id();
+		
+		return static::$last_inserted_id;
+	}
 
 	// ------------------------------------------------------------------------
 	// Collection

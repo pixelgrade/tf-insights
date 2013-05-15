@@ -5,7 +5,7 @@
  */
 
 // Include the library
-include('vendor/simple_html_dom.php');
+include \app\CFS::dir('vendor/simple_html_dom').'simple_html_dom'.EXT;
 
 /**
  * @package    tfinsights
@@ -46,7 +46,6 @@ class Task_Grab_Items extends \app\Task_Base
 			// Retrieve the DOM from the current URL
 			$html = \file_get_html($url);
 			
-			//get the title and episode number
 			$det = $html->find('ul.item-list',0);
 			$tempresults = $det->find('li.'.$class);
 			
@@ -67,14 +66,60 @@ class Task_Grab_Items extends \app\Task_Base
 				
 				if ($item_data["item"])
 				{
-					\app\Model_Item::process($item_data['item']);
+					$entry = \app\Model_Item::entry($item_data["item"]["id"]);
+					
+					if (empty($entry))
+					{
+						//let's do some preprocessing
+						//we need to get the category id
+						$cat_id = \app\Model_ItemCategory::get_entry_by_slug($item_data["item"]["category"])['id'];
+						if (empty($cat_id))
+						{
+							$cat_id = \app\Model_ItemCategory::insert_by_slug($item_data["item"]["category"]);
+						}
+
+						//we need to get the user id
+						$user_id = \app\Model_ItemAuthor::get_entry_by_username($item_data["item"]["user"])['id'];
+						if (empty($user_id))
+						{
+							//get the info about the user
+							$user_data = $this->fetch_json_data('http://marketplace.envato.com/api/v3/user:'.$item_data["item"]["user"].'.json');
+
+							$user_id = \app\Model_ItemAuthor::process($user_data['user']);
+						}
+
+						//add the ids
+						$item_data['item']['userid'] = $user_id;
+						$item_data['item']['category'] = $cat_id;
+						
+						//fix the dates
+						$item_data['item']['uploaded_on'] = date('Y-m-d H:i:s', strtotime($item_data['item']['uploaded_on']));
+						$item_data['item']['last_update'] = date('Y-m-d H:i:s', strtotime($item_data['item']['last_update']));
+						
+						
+						//add to database
+						\app\Model_Item::process($item_data['item']);
+						
+						$this->writer->printf('status','+', 'Added new item .... '.$item_data["item"]["item"])->eol();
+					}
+					else
+					{
+						//fix the dates
+						$item_data['item']['uploaded_on'] = date('Y-m-d H:i:s', strtotime($item_data['item']['uploaded_on']));
+						$item_data['item']['last_update'] = date('Y-m-d H:i:s', strtotime($item_data['item']['last_update']));
+						
+						//we update the entry
+						\app\Model_Item::update($entry['id'],$item_data['item']);
+						
+						$this->writer->printf('status','|', 'Updated item .... '.$item_data["item"]["item"])->eol();
+					}
 				}
 			}
 			
 			
 			// get the url to the next page
 			$det = $html->find('div.pagination',0);
-			$next_url = $det->find('a[rel="nextt"]',0);
+			$next_url = $det->find('a[rel="next"]',0);
 			if (!empty($next_url))
 			{
 				$url = 'http://themeforest.net'.$next_url->attr["href"];

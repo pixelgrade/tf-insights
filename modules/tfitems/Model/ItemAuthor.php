@@ -17,6 +17,22 @@ class Model_ItemAuthor
 	 * @var string
 	 */
 	protected static $table = 'pxg_itemauthors';
+	
+	protected static $fieldlist = array
+		(
+			'nums' => array
+				(
+					'sales', 'followers',
+				),
+			'strs' => array
+				(
+					'username', 'country', 'location','image',
+				),
+			'bools' => array
+				(
+				
+				),
+		);
 
 	/**
 	 * @return string table
@@ -37,12 +53,53 @@ class Model_ItemAuthor
 	// -------------------------------------------------------------------------
 	// factory interface
 	
-	
+	static function process(array $fields)
+	{
+		static::inserter($fields, static::$fieldlist['strs'], static::$fieldlist['bools'], static::$fieldlist['nums'])->run();
+		static::$last_inserted_id = \app\SQL::last_inserted_id();
+		
+		return static::$last_inserted_id;
+	}
 
 	// ------------------------------------------------------------------------
 	// Collection
 
+	/**
+	 * @param int id
+	 * @return array 
+	 */
+	static function get_entry_by_username($username)
+	{
+		if ($username === null)
+		{
+			return null;
+		}
+		
+		$stashkey = __CLASS__.'_USERNAME'.$username;
+		$entry = \app\Stash::get($stashkey, null);
+		
+		if ( ! $entry)
+		{
+			$entry = static::statement
+				(
+					__METHOD__,
+					'
+						SELECT author.*
+						  FROM :table author
+						 WHERE author.username = :username
+					',
+					'mysql'
+				)
+				->str(':username', $username)
+				->run()
+				->fetch_entry();
+			
+			\app\Stash::store($stashkey, $entry, \app\Stash::tags(\get_called_class(), ['change']));
+		}
+		
+		return $entry;
 	
+	}
 
 	// -------------------------------------------------------------------------
 	// Extended

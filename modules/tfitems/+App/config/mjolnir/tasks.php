@@ -23,4 +23,16 @@
 							),
 					),
 			),
+	
+		'grab:sales' => array
+			(
+				'description' => array
+					(
+						'Grab sales from TF for today.'
+					),
+				'flags' => array
+					(
+						
+					),
+			),
 	);

@@ -22,11 +22,11 @@ class Model_Item
 		(
 			'nums' => array
 				(
-				
+					'id', 'userid', 'category', 'cost', 'rating',
 				),
 			'strs' => array
 				(
-					
+					'item', 'url',  'live_preview_url', 'thumbnail', 'tags', 'uploaded_on', 'last_update',
 				),
 			'bools' => array
 				(
@@ -61,9 +61,30 @@ class Model_Item
 	// -------------------------------------------------------------------------
 	// factory interface
 	
+	/**
+	 * @return \app\Validator
+	 */
+	static function check(array $fields, $context = null)
+	{
+		return \app\Validator::instance($fields)
+			->rule(['cost','rating','item', 'url', 'live_preview_url', 'thumbnail', 'tags', 'uploaded_on', 'last_update'], 'not_empty');
+	}
+	
 	static function process(array $fields)
 	{
 		static::inserter($fields, static::$fieldlist['strs'], static::$fieldlist['bools'], static::$fieldlist['nums'])->run();
+		static::$last_inserted_id = \app\SQL::last_inserted_id();
+		
+		return static::$last_inserted_id;
+	}
+	
+	/**
+	 * Update 
+	 */
+	static function update_process($id, array $fields)
+	{
+		static::updater($id, $fields, static::$fieldlist['strs'], static::$fieldlist['bools'], ['cost', 'rating'])->run();
+		static::clear_entry_cache($id);
 	}
 
 	// ------------------------------------------------------------------------

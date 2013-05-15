@@ -3,67 +3,70 @@
 // This is an IDE honeypot. It tells IDEs the class hirarchy, but otherwise has
 // no effect on your application. :)
 
-// HowTo: order honeypot -n 'tfinsights\core'
+// HowTo: order honeypot -n 'tfinsights\items'
 
 
-/**
- * @method \app\Controller_Dashboard add_preprocessor($name, $processor)
- * @method \app\Controller_Dashboard add_postprocessor($name, $processor)
- * @method \app\Controller_Dashboard preprocess()
- * @method \app\Controller_Dashboard postprocess()
- * @method \app\Controller_Dashboard channel_is($channel)
- * @method \app\Channel channel()
- * @method \app\Renderable public_index()
- * @method \app\Lang lang()
- * @method \app\Theme theme()
- */
-class Controller_Dashboard extends \tfinsights\core\Controller_Dashboard
+class Model_Crawler extends \tfinsights\items\Model_Crawler
 {
-	/** @return \app\Controller_Dashboard */
+	/** @return \app\Validator */
+	static function update_check($id, array $fields) { return parent::update_check($id, $fields); }
+	/** @return \app\SQLStatement */
+	static function statement($identifier, $sql, $lang = null) { return parent::statement($identifier, $sql, $lang); }
+}
+
+class Model_Item extends \tfinsights\items\Model_Item
+{
+	/** @return \app\Validator */
+	static function update_check($id, array $fields) { return parent::update_check($id, $fields); }
+	/** @return \app\SQLStatement */
+	static function statement($identifier, $sql, $lang = null) { return parent::statement($identifier, $sql, $lang); }
+}
+
+class Model_ItemAuthor extends \tfinsights\items\Model_ItemAuthor
+{
+	/** @return \app\Validator */
+	static function update_check($id, array $fields) { return parent::update_check($id, $fields); }
+	/** @return \app\SQLStatement */
+	static function statement($identifier, $sql, $lang = null) { return parent::statement($identifier, $sql, $lang); }
+}
+
+class Model_ItemCategory extends \tfinsights\items\Model_ItemCategory
+{
+	/** @return \app\Validator */
+	static function update_check($id, array $fields) { return parent::update_check($id, $fields); }
+	/** @return \app\SQLStatement */
+	static function statement($identifier, $sql, $lang = null) { return parent::statement($identifier, $sql, $lang); }
+}
+
+class Model_ItemStats extends \tfinsights\items\Model_ItemStats
+{
+	/** @return \app\Validator */
+	static function update_check($id, array $fields) { return parent::update_check($id, $fields); }
+	/** @return \app\SQLStatement */
+	static function statement($identifier, $sql, $lang = null) { return parent::statement($identifier, $sql, $lang); }
+}
+
+class Schematic_Tfinsights_Items_Base extends \tfinsights\items\Schematic_Tfinsights_Items_Base
+{
+	/** @return \app\Schematic_Tfinsights_Items_Base */
 	static function instance() { return parent::instance(); }
 }
 
 /**
- * @method \app\Controller_Home add_preprocessor($name, $processor)
- * @method \app\Controller_Home add_postprocessor($name, $processor)
- * @method \app\Controller_Home preprocess()
- * @method \app\Controller_Home postprocess()
- * @method \app\Controller_Home channel_is($channel)
- * @method \app\Channel channel()
- * @method \app\Renderable public_index()
- * @method \app\Lang lang()
- * @method \app\Theme theme()
+ * @method \app\Task_Grab_Items set($name, $value)
+ * @method \app\Task_Grab_Items add($name, $value)
+ * @method \app\Task_Grab_Items metadata_is(array $metadata = null)
+ * @method \app\Task_Grab_Items writer_is($writer)
+ * @method \app\Writer writer()
  */
-class Controller_Home extends \tfinsights\core\Controller_Home
+class Task_Grab_Items extends \tfinsights\items\Task_Grab_Items
 {
-	/** @return \app\Controller_Home */
+	/** @return \app\Task_Grab_Items */
 	static function instance() { return parent::instance(); }
 }
 
-/**
- * @method \app\Controller_Login add_preprocessor($name, $processor)
- * @method \app\Controller_Login add_postprocessor($name, $processor)
- * @method \app\Controller_Login preprocess()
- * @method \app\Controller_Login postprocess()
- * @method \app\Controller_Login channel_is($channel)
- * @method \app\Channel channel()
- * @method \app\Renderable action_signin()
- * @method \app\Renderable public_signin()
- * @method \app\Renderable public_signout()
- * @method \app\Renderable signin_view($errors = null)
- * @method \app\Renderable public_index()
- * @method \app\Lang lang()
- * @method \app\Theme theme()
- */
-class Controller_Login extends \tfinsights\core\Controller_Login
+class Task_Grab_Sales extends \tfinsights\items\Task_Grab_Sales
 {
-	/** @return \app\Controller_Login */
-	static function instance() { return parent::instance(); }
+	/** @return \app\Task_Grab_Sales */
+	static function invoke($encoded_task) { return parent::invoke($encoded_task); }
 }
-
-class Schematic_Mjolnir_Access_Demo extends \tfinsights\core\Schematic_Mjolnir_Access_Demo
-{
-	/** @return \app\Schematic_Mjolnir_Access_Demo */
-	static function instance() { return parent::instance(); }
-}
-trait Trait_Controller_DemoBase { use \tfinsights\core\Trait_Controller_DemoBase; }
