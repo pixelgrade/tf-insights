@@ -33,6 +33,11 @@ class Model_Item
 				
 				),
 		);
+	
+	/**
+	 * @var array
+	 */
+	protected static $field_format = [];
 
 	/**
 	 * @return string table
@@ -90,7 +95,34 @@ class Model_Item
 	// ------------------------------------------------------------------------
 	// Collection
 
-	
+	static function get_items_stats($page=1, $limit=100, $offset = 0, $order = ['sales' => 'DESC'], $constraints = [])
+	{		
+		return static::stash
+			(
+				__METHOD__,
+				'
+					SELECT 
+						items.*,
+						category.title as category_name,
+						category.slug as category_slug,
+						stats.sales as sales
+						
+						FROM :table items
+						LEFT OUTER
+							JOIN (SELECT * FROM (SELECT *  FROM `'.static::stats_table().'` ORDER BY timestamp DESC) as sl  GROUP BY itemid ORDER BY sales DESC) as stats
+							ON stats.itemid = items.id 
+						LEFT OUTER
+							JOIN `'.static::category_table().'` category
+							ON category.id = items.category
+				',
+				'mysql'
+			)
+			->key(__CLASS__.'_'.__FUNCTION__)
+			->page($page, $limit, $offset)
+			->order($order)
+			->constraints($constraints)
+			->fetch_all(static::$field_format);
+	}
 
 	// -------------------------------------------------------------------------
 	// Extended

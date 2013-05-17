@@ -5,6 +5,7 @@
 		'modules' => array
 			(
 				// project modules
+				$modpath.'api.v1' => 'tfinsights\api\v1',
 				$modpath.'tfitems'    => 'tfinsights\items',
 
 			// ---- Plugins ---------------------------------------------------

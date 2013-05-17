@@ -18,8 +18,15 @@
 			 * Allow::relays, Allow::backend, or Ban::relays, etc can be used to
 			 * create basic protocols for common access requirements.
 			 */
-
-			// empty
+		
+			 Auth::Guest => array
+				(
+					Allow::relays
+						(
+							'v1-items.api'
+						)
+						->unrestricted(),
+				),
 		),
 
 	'blacklist' => array # disallow! (no matter what)
