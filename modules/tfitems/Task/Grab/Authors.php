@@ -26,18 +26,16 @@ class Task_Grab_Authors extends \app\Task_Base
 		{
 			$this->writer->printf('status','-', 'Updating author .... '.$entry['username'])->eol();
 			$user_id = $entry['id'];
-			if (empty($user_id))
-			{
-				//get the info about the user
-				$user_data = $this->fetch_json_data('http://marketplace.envato.com/api/v3/user:'.$entry['username'].'.json');
+			
+			//get the info about the user
+			$user_data = $this->fetch_json_data('http://marketplace.envato.com/api/v3/user:'.$entry['username'].'.json');
 
-				\app\Model_ItemAuthor::update($user_id, $user_data['user']);
-			}
-
+			\app\Model_ItemAuthor::update($user_id, $user_data['user']);
+			
 			$counter++;
 			
-			//wait every 30 authors
-			if ($counter % 30 == 0)
+			//wait every 50 authors
+			if ($counter % 50 == 0)
 			{
 				//$this->writer->printf('status','#', 'Waiting 5 seconds .... ')->eol();
 				\sleep(5);
