@@ -26,7 +26,7 @@ class Model_ItemAuthor
 				),
 			'strs' => array
 				(
-					'username', 'country', 'location','image',
+					'username', 'level', 'saleslevel', 'country', 'location','image',
 				),
 			'bools' => array
 				(
@@ -76,6 +76,16 @@ class Model_ItemAuthor
 	static function update_process($id, array $fields)
 	{
 		static::updater($id, $fields, [], [], static::$fieldlist['nums'])->run();
+		static::clear_entry_cache($id);
+	}
+	
+	static function update_saleslevel($id, $level) {
+		static::updater($id, ['saleslevel' => $level], ['saleslevel'], [], [])->run();
+		static::clear_entry_cache($id);
+	}
+	
+	static function update_level($id, $level) {
+		static::updater($id, ['level' => $level], ['level'], [], [])->run();
 		static::clear_entry_cache($id);
 	}
 

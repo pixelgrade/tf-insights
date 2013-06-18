@@ -37,8 +37,9 @@ class Schematic_Tfinsights_Items_Base extends \app\Instantiatable implements \mj
 					`item`			varchar(1000) DEFAULT \'\',
 					`url`			varchar(1000) DEFAULT \'\',
 					`live_preview_url`          varchar(1000) DEFAULT \'\',
-					`cost`			:counter,
-					`rating`		:counter DEFAULT \'0\',
+					`cost`			INT(5),
+					`rating`		DECIMAL(4,2) DEFAULT \'0\',
+					`comments`		INT(6) DEFAULT \'0\',
 					`thumbnail`		varchar(1000) DEFAULT \'\',
 					`tags`			varchar(1500) DEFAULT \'\',
 					`uploaded_on`	:datetime_optional,
@@ -56,6 +57,8 @@ class Schematic_Tfinsights_Items_Base extends \app\Instantiatable implements \mj
 					`username`     varchar(100) DEFAULT \'\',
 					`country`      varchar(100) DEFAULT \'\',
 					`sales`        :counter,
+					`level`		   varchar(200) DEFAULT \'Regular\',
+					`saleslevel`   varchar(500) DEFAULT \'\',
 					`location`     varchar(500) DEFAULT \'\',
 					`image`		   varchar(1000) DEFAULT \'\',
 					`followers`    :counter,
@@ -89,6 +92,22 @@ class Schematic_Tfinsights_Items_Base extends \app\Instantiatable implements \mj
 		
 		\app\Schematic::table
 			(
+				\app\Model_ItemRatings::table(), 
+				'
+					`itemid`		:key_foreign,
+					`rating`		DECIMAL(4,2) DEFAULT 0,
+					`votes`			int(3) DEFAULT 0,
+					`votes1stars`	int(3) DEFAULT 0,
+					`votes2stars`	int(3) DEFAULT 0,
+					`votes3stars`	int(3) DEFAULT 0,
+					`votes4stars`	int(3) DEFAULT 0,
+					`votes5stars`	int(3) DEFAULT 0,
+					`timestamp`		TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+				'
+			);
+		
+		\app\Schematic::table
+			(
 				\app\Model_Crawler::table(), 
 				'
 					`id`			:key_primary,
@@ -113,6 +132,10 @@ class Schematic_Tfinsights_Items_Base extends \app\Instantiatable implements \mj
 							'category' => [\app\Model_ItemCategory::table(), 'CASCADE', 'CASCADE'],
 						),
 					\app\Model_ItemStats::table() => array
+						(
+							'itemid' => [\app\Model_Item::table(), 'CASCADE', 'CASCADE'],
+						),
+					\app\Model_ItemRatings::table() => array
 						(
 							'itemid' => [\app\Model_Item::table(), 'CASCADE', 'CASCADE'],
 						),

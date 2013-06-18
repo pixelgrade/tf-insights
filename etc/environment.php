@@ -15,7 +15,7 @@
 			// ---- Libraries -------------------------------------------------
 
 				// legacy code support
-#				$vdrpath.'mjolnir/legacy'     => 'mjolnir\legacy',
+				$vdrpath.'mjolnir/legacy'     => 'mjolnir\legacy',
 
 				// profiling
 				$vdrpath.'mjolnir/profile'    => 'mjolnir\profile',

@@ -91,6 +91,11 @@ class Model_Item
 		static::updater($id, $fields, static::$fieldlist['strs'], static::$fieldlist['bools'], ['cost', 'rating'])->run();
 		static::clear_entry_cache($id);
 	}
+	
+	static function update_comments($id, $comments) {
+		static::updater($id, ['comments' => $comments], [], [], ['comments'])->run();
+		static::clear_entry_cache($id);
+	}
 
 	// ------------------------------------------------------------------------
 	// Collection

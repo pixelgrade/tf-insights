@@ -2,6 +2,7 @@
 	(
 		'grab:items' => array
 			(
+				'category' => 'Task',
 				'description' => array
 					(
 						'Grab items from TF.'
@@ -26,6 +27,7 @@
 	
 		'grab:sales' => array
 			(
+				'category' => 'Task',
 				'description' => array
 					(
 						'Grab sales from TF for today.'
@@ -35,8 +37,21 @@
 						
 					),
 			),
+		'grab:ratings' => array
+			(
+				'category' => 'Task',
+				'description' => array
+					(
+						'Grab ratings from TF for today.'
+					),
+				'flags' => array
+					(
+						
+					),
+			),
 		'grab:authors' => array
 			(
+				'category' => 'Task',
 				'description' => array
 					(
 						'Update the authors information.'

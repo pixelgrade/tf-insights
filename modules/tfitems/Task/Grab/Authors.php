@@ -29,8 +29,11 @@ class Task_Grab_Authors extends \app\Task_Base
 			
 			//get the info about the user
 			$user_data = $this->fetch_json_data('http://marketplace.envato.com/api/v3/user:'.$entry['username'].'.json');
-
-			\app\Model_ItemAuthor::update($user_id, $user_data['user']);
+			if (!empty($user_data['user'])) {
+				\app\Model_ItemAuthor::update($user_id, $user_data['user']);
+			} else {
+				$this->writer->printf('status','X', 'Author not found .... '.$entry['username'])->eol();
+			}
 			
 			$counter++;
 			
