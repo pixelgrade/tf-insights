@@ -60,6 +60,15 @@ class Model_ItemAuthor
 		
 		return static::$last_inserted_id;
 	}
+	
+	/**
+	 * Update 
+	 */
+	static function update_process($id, array $fields)
+	{
+		static::updater($id, $fields, [], [], static::$fieldlist['nums'])->run();
+		static::clear_entry_cache($id);
+	}
 
 	// ------------------------------------------------------------------------
 	// Collection

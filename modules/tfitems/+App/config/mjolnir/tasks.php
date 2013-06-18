@@ -35,4 +35,15 @@
 						
 					),
 			),
+		'grab:authors' => array
+			(
+				'description' => array
+					(
+						'Update the authors information.'
+					),
+				'flags' => array
+					(
+						
+					),
+			),
 	);
