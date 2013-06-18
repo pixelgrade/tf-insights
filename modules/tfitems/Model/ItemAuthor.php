@@ -53,6 +53,15 @@ class Model_ItemAuthor
 	// -------------------------------------------------------------------------
 	// factory interface
 	
+	/**
+	 * @return \app\Validator
+	 */
+	static function check(array $fields, $context = null)
+	{
+		return \app\Validator::instance($fields)
+			->rule(['sales','followers'], 'not_empty');
+	}
+	
 	static function process(array $fields)
 	{
 		static::inserter($fields, static::$fieldlist['strs'], static::$fieldlist['bools'], static::$fieldlist['nums'])->run();
