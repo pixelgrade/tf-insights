@@ -154,8 +154,8 @@ class Task_Grab_Ratings extends \app\Task_Base
 			
 			$counter++;
 			
-			//wait every 30 items
-			if ($counter % 30 == 0)
+			//wait every 50 items
+			if ($counter % 50 == 0)
 			{
 				if ($this->get('verbose', null) == 'on') {
 					$this->writer->printf('status','#', 'Waiting 3 seconds .... ')->eol();
