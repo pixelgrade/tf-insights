@@ -49,90 +49,94 @@ class Task_Grab_Items extends \app\Task_Base
 			// Retrieve the DOM from the current URL
 			$html = \file_get_html($url);
 			
-			$det = $html->find('ul.item-list',0);
-			$tempresults = $det->find('li.'.$class);
+			if (!empty($html) && $html !== false) {
 			
-			//get the item ids from this page
-			$item_ids = array();
-			foreach ($tempresults as $key => $item)
-			{
-				$item_ids[] = $item->attr["data-item-id"];
-			}
-			
-			//lets add these found items to the database
-			foreach ($item_ids as $itemid)
-			{
-				$fields = array();
-				
-				//get the json info
-				$item_data = $this->fetch_json_data('http://marketplace.envato.com/api/v3/item:'.$itemid.'.json');
-				
-				if ($item_data["item"])
+				$det = $html->find('ul.item-list',0);
+				$tempresults = $det->find('li.'.$class);
+
+				//get the item ids from this page
+				$item_ids = array();
+				foreach ($tempresults as $key => $item)
 				{
-					$entry = \app\Model_Item::entry($item_data["item"]["id"]);
-					
-					if (empty($entry))
+					$item_ids[] = $item->attr["data-item-id"];
+				}
+
+				//lets add these found items to the database
+				foreach ($item_ids as $itemid)
+				{
+					$fields = array();
+
+					//get the json info
+					$item_data = $this->fetch_json_data('http://marketplace.envato.com/api/v3/item:'.$itemid.'.json');
+
+					if ($item_data["item"])
 					{
-						//let's do some preprocessing
-						//we need to get the category id
-						$cat_id = \app\Model_ItemCategory::get_entry_by_slug($item_data["item"]["category"])['id'];
-						if (empty($cat_id))
+						$entry = \app\Model_Item::entry($item_data["item"]["id"]);
+
+						if (empty($entry))
 						{
-							$cat_id = \app\Model_ItemCategory::insert_by_slug($item_data["item"]["category"]);
-						}
+							//let's do some preprocessing
+							//we need to get the category id
+							$cat_id = \app\Model_ItemCategory::get_entry_by_slug($item_data["item"]["category"])['id'];
+							if (empty($cat_id))
+							{
+								$cat_id = \app\Model_ItemCategory::insert_by_slug($item_data["item"]["category"]);
+							}
 
-						//we need to get the user id
-						$user_id = \app\Model_ItemAuthor::get_entry_by_username($item_data["item"]["user"])['id'];
-						if (empty($user_id))
+							//we need to get the user id
+							$user_id = \app\Model_ItemAuthor::get_entry_by_username($item_data["item"]["user"])['id'];
+							if (empty($user_id))
+							{
+								//get the info about the user
+								$user_data = $this->fetch_json_data('http://marketplace.envato.com/api/v3/user:'.$item_data["item"]["user"].'.json');
+
+								$user_id = \app\Model_ItemAuthor::process($user_data['user']);
+							}
+
+							//add the ids
+							$item_data['item']['userid'] = $user_id;
+							$item_data['item']['category'] = $cat_id;
+
+							//fix the dates
+							$item_data['item']['uploaded_on'] = date('Y-m-d H:i:s', strtotime($item_data['item']['uploaded_on']));
+							$item_data['item']['last_update'] = date('Y-m-d H:i:s', strtotime($item_data['item']['last_update']));
+
+
+							//add to database
+							\app\Model_Item::process($item_data['item']);
+							if ($this->get('verbose', null) == 'on') {
+								$this->writer->printf('status','+', 'Added new item .... '.$item_data["item"]["item"])->eol();
+							}
+						}
+						else
 						{
-							//get the info about the user
-							$user_data = $this->fetch_json_data('http://marketplace.envato.com/api/v3/user:'.$item_data["item"]["user"].'.json');
+							//fix the dates
+							$item_data['item']['uploaded_on'] = date('Y-m-d H:i:s', strtotime($item_data['item']['uploaded_on']));
+							$item_data['item']['last_update'] = date('Y-m-d H:i:s', strtotime($item_data['item']['last_update']));
 
-							$user_id = \app\Model_ItemAuthor::process($user_data['user']);
-						}
-
-						//add the ids
-						$item_data['item']['userid'] = $user_id;
-						$item_data['item']['category'] = $cat_id;
-						
-						//fix the dates
-						$item_data['item']['uploaded_on'] = date('Y-m-d H:i:s', strtotime($item_data['item']['uploaded_on']));
-						$item_data['item']['last_update'] = date('Y-m-d H:i:s', strtotime($item_data['item']['last_update']));
-						
-						
-						//add to database
-						\app\Model_Item::process($item_data['item']);
-						if ($this->get('verbose', null) == 'on') {
-							$this->writer->printf('status','+', 'Added new item .... '.$item_data["item"]["item"])->eol();
-						}
-					}
-					else
-					{
-						//fix the dates
-						$item_data['item']['uploaded_on'] = date('Y-m-d H:i:s', strtotime($item_data['item']['uploaded_on']));
-						$item_data['item']['last_update'] = date('Y-m-d H:i:s', strtotime($item_data['item']['last_update']));
-						
-						//we update the entry
-						\app\Model_Item::update($entry['id'],$item_data['item']);
-						if ($this->get('verbose', null) == 'on') {
-							$this->writer->printf('status','|', 'Updated item .... '.$item_data["item"]["item"])->eol();
+							//we update the entry
+							\app\Model_Item::update($entry['id'],$item_data['item']);
+							if ($this->get('verbose', null) == 'on') {
+								$this->writer->printf('status','|', 'Updated item .... '.$item_data["item"]["item"])->eol();
+							}
 						}
 					}
 				}
-			}
+
+
+				// get the url to the next page
+				$det = $html->find('div.pagination',0);
+				$next_url = $det->find('a[rel="next"]',0);
+				if (!empty($next_url))
+				{
+					$url = 'http://themeforest.net'.$next_url->attr["href"];
+				}
+				else
+				{
+					//we have reached the end
+					$reachedtheend = true;
+				}
 			
-			
-			// get the url to the next page
-			$det = $html->find('div.pagination',0);
-			$next_url = $det->find('a[rel="next"]',0);
-			if (!empty($next_url))
-			{
-				$url = 'http://themeforest.net'.$next_url->attr["href"];
-			}
-			else
-			{
-				//we have reached the end
-				$reachedtheend = true;
 			}
 			
 			\sleep(1);

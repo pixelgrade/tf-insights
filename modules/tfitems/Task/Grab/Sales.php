@@ -29,7 +29,7 @@ class Task_Grab_Sales extends \app\Task_Base
 			//get the json info
 			$item_data = $this->fetch_json_data('http://marketplace.envato.com/api/v3/item:'.$entry['id'].'.json');
 
-			if ($item_data["item"])
+			if (!empty($item_data["item"]))
 			{
 				//add to database
 				\app\Model_ItemStats::process(['itemid'=>$entry['id'], 'sales' => $item_data['item']['sales']]);
