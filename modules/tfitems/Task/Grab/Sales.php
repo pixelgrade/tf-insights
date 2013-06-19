@@ -17,7 +17,9 @@ class Task_Grab_Sales extends \app\Task_Base
 	function grab_sales($target)
 	{		
 		//begin
-		//$this->writer->printf('status','Info', 'Firing up the sales crawler...Vrrruuuummm vrrrummm')->eol();
+		if ($this->get('verbose', null) == 'on') {
+			$this->writer->printf('status','Info', 'Firing up the sales crawler...Vrrruuuummm vrrrummm')->eol();
+		}
 		
 		$entries = \app\Model_Item::entries(1,1000000);
 		$counter = 0;
@@ -32,15 +34,19 @@ class Task_Grab_Sales extends \app\Task_Base
 				//add to database
 				\app\Model_ItemStats::process(['itemid'=>$entry['id'], 'sales' => $item_data['item']['sales']]);
 
-				//$this->writer->printf('status','+', 'Added new item sales .... '.$item_data["item"]["item"])->eol();
+				if ($this->get('verbose', null) == 'on') {
+					$this->writer->printf('status','+', 'Added new item sales .... '.$item_data["item"]["item"])->eol();
+				}
 			}
 			$counter++;
 			
-			//wait every 30 items
-			if ($counter % 30 == 0)
+			//wait every 50 items
+			if ($counter % 50 == 0)
 			{
-				//$this->writer->printf('status','#', 'Waiting 5 seconds .... ')->eol();
-				\sleep(5);
+				if ($this->get('verbose', null) == 'on') {
+					$this->writer->printf('status','#', 'Waiting 3 seconds .... ')->eol();
+				}
+				\sleep(3);
 			}
 		}
 	}
@@ -67,7 +73,9 @@ class Task_Grab_Sales extends \app\Task_Base
 	
 	function run()
 	{
-		//\app\Task::consolewriter($this->writer);
+		if ($this->get('verbose', null) == 'on') {
+			\app\Task::consolewriter($this->writer);
+		}
 		
 		$target = \app\SQLDatabase::instance(); // default database
 		

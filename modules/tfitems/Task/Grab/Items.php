@@ -36,12 +36,15 @@ class Task_Grab_Items extends \app\Task_Base
 		//we have the config; proceed
 		
 		//begin
-		$this->writer->printf('status','Info', 'Firing up the crawler...Vrrruuuummm vrrrummm')->eol();
+		if ($this->get('verbose', null) == 'on') {
+			$this->writer->printf('status','Info', 'Firing up the crawler...Vrrruuuummm vrrrummm')->eol();
+		}
 		$reachedtheend = false;
 		while (!$reachedtheend)
 		{
-			$this->writer->printf('status','-', 'Processing .... '.$url)->eol();
-			
+			if ($this->get('verbose', null) == 'on') {
+				$this->writer->printf('status','-', 'Processing .... '.$url)->eol();
+			}			
 			
 			// Retrieve the DOM from the current URL
 			$html = \file_get_html($url);
@@ -99,8 +102,9 @@ class Task_Grab_Items extends \app\Task_Base
 						
 						//add to database
 						\app\Model_Item::process($item_data['item']);
-						
-						$this->writer->printf('status','+', 'Added new item .... '.$item_data["item"]["item"])->eol();
+						if ($this->get('verbose', null) == 'on') {
+							$this->writer->printf('status','+', 'Added new item .... '.$item_data["item"]["item"])->eol();
+						}
 					}
 					else
 					{
@@ -110,8 +114,9 @@ class Task_Grab_Items extends \app\Task_Base
 						
 						//we update the entry
 						\app\Model_Item::update($entry['id'],$item_data['item']);
-						
-						$this->writer->printf('status','|', 'Updated item .... '.$item_data["item"]["item"])->eol();
+						if ($this->get('verbose', null) == 'on') {
+							$this->writer->printf('status','|', 'Updated item .... '.$item_data["item"]["item"])->eol();
+						}
 					}
 				}
 			}
@@ -202,7 +207,9 @@ class Task_Grab_Items extends \app\Task_Base
 	
 	function run()
 	{
-		\app\Task::consolewriter($this->writer);
+		if ($this->get('verbose', null) == 'on') {
+			\app\Task::consolewriter($this->writer);
+		}
 		
 		$target = \app\SQLDatabase::instance(); // default database
 		

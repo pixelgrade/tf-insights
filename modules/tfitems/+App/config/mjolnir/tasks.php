@@ -22,6 +22,14 @@
 								'description' => 'A div class that holds the ids (i.e. <li class="wordpress-template" data-item-id="4720197">).',
 								'short' => 'c'
 							),
+					
+						'verbose' => array
+							(
+								'type' => 'text',
+								'description' => 'Do you want to show status text?',
+								'short' => 'v',
+								'default' => false,
+							),
 					),
 			),
 	
@@ -34,7 +42,13 @@
 					),
 				'flags' => array
 					(
-						
+						'verbose' => array
+							(
+								'type' => 'text',
+								'description' => 'Do you want to show status text?',
+								'short' => 'v',
+								'default' => false,
+							),
 					),
 			),
 		'grab:ratings' => array
@@ -46,7 +60,13 @@
 					),
 				'flags' => array
 					(
-						
+						'verbose' => array
+							(
+								'type' => 'text',
+								'description' => 'Do you want to show status text?',
+								'short' => 'v',
+								'default' => false,
+							),
 					),
 			),
 		'grab:authors' => array
@@ -58,7 +78,13 @@
 					),
 				'flags' => array
 					(
-						
+						'verbose' => array
+							(
+								'type' => 'text',
+								'description' => 'Do you want to show status text?',
+								'short' => 'v',
+								'default' => false,
+							),
 					),
 			),
 	);

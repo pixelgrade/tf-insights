@@ -17,14 +17,21 @@ class Task_Grab_Authors extends \app\Task_Base
 	function grab_authors($target)
 	{		
 		//begin
-		//$this->writer->printf('status','Info', 'Firing up the sales crawler...Vrrruuuummm vrrrummm')->eol();
+		if ($this->get('verbose', null) == 'on') {
+			$this->writer->printf('status','Info', 'Firing up the sales crawler...Vrrruuuummm vrrrummm')->eol();
+		}
 		
 		$entries = \app\Model_ItemAuthor::entries(1,1000000);
 		$counter = 0;
-		$this->writer->printf('status','Info', 'Firing up the crawler...Vrrruuuummm vrrrummm')->eol();
+		if ($this->get('verbose', null) == 'on') {
+			$this->writer->printf('status','Info', 'Firing up the crawler...Vrrruuuummm vrrrummm')->eol();
+		}
 		foreach ($entries as $entry)
 		{
-			$this->writer->printf('status','-', 'Updating author .... '.$entry['username'])->eol();
+			if ($this->get('verbose', null) == 'on') {
+				$this->writer->printf('status','-', 'Updating author .... '.$entry['username'])->eol();
+			}
+			
 			$user_id = $entry['id'];
 			
 			//get the info about the user
@@ -32,7 +39,9 @@ class Task_Grab_Authors extends \app\Task_Base
 			if (!empty($user_data['user'])) {
 				\app\Model_ItemAuthor::update($user_id, $user_data['user']);
 			} else {
-				$this->writer->printf('status','X', 'Author not found .... '.$entry['username'])->eol();
+				if ($this->get('verbose', null) == 'on') {
+					$this->writer->printf('status','X', 'Author not found .... '.$entry['username'])->eol();
+				}
 			}
 			
 			$counter++;
@@ -40,8 +49,10 @@ class Task_Grab_Authors extends \app\Task_Base
 			//wait every 50 authors
 			if ($counter % 50 == 0)
 			{
-				//$this->writer->printf('status','#', 'Waiting 5 seconds .... ')->eol();
-				\sleep(5);
+				if ($this->get('verbose', null) == 'on') {
+					$this->writer->printf('status','#', 'Waiting 3 seconds .... ')->eol();
+				}
+				\sleep(3);
 			}
 		}
 	}
@@ -68,7 +79,9 @@ class Task_Grab_Authors extends \app\Task_Base
 	
 	function run()
 	{
-		\app\Task::consolewriter($this->writer);
+		if ($this->get('verbose', null) == 'on') {
+			\app\Task::consolewriter($this->writer);
+		}
 		
 		$target = \app\SQLDatabase::instance(); // default database
 		

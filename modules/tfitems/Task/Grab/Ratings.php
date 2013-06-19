@@ -17,7 +17,9 @@ class Task_Grab_Ratings extends \app\Task_Base
 	function grab_ratings($target)
 	{		
 		//begin
-		//$this->writer->printf('status','Info', 'Firing up the sales crawler...Vrrruuuummm vrrrummm')->eol();
+		if ($this->get('verbose', null) == 'on') {
+			$this->writer->printf('status','Info', 'Firing up the sales crawler...Vrrruuuummm vrrrummm')->eol();
+		}
 		
 		$entries = \app\Model_Item::entries(1,1000000);
 		$counter = 0;
@@ -25,7 +27,9 @@ class Task_Grab_Ratings extends \app\Task_Base
 		foreach ($entries as $entry)
 		{
 			$entryratings = \app\Model_ItemRatings::entry($entry['id']);
-			//$this->writer->printf('status','+', 'Working on .... '.$entry['url'])->eol();
+			if ($this->get('verbose', null) == 'on') {
+				$this->writer->printf('status','+', 'Working on .... '.$entry['url'])->eol();
+			}
 			// Retrieve the DOM from the current URL
 			$html = \file_get_html($entry['url']);
 			
@@ -76,14 +80,16 @@ class Task_Grab_Ratings extends \app\Task_Base
 					if (!empty($entryratings)) {
 						//add to database
 						\app\Model_ItemRatings::update($entry['id'], $item_data);
-						
-						//$this->writer->printf('status','+', 'Updated ratings for .... '.$entry['item'])->eol();
+						if ($this->get('verbose', null) == 'on') {
+							$this->writer->printf('status','+', 'Updated ratings for .... '.$entry['item'])->eol();
+						}
 					} else {
 						$item_data['itemid'] = $entry['id'];
 						//add to database
 						\app\Model_ItemRatings::process($item_data);
-						
-						//$this->writer->printf('status','+', 'Added ratings for .... '.$entry['item'])->eol();
+						if ($this->get('verbose', null) == 'on') {
+							$this->writer->printf('status','+', 'Added ratings for .... '.$entry['item'])->eol();
+						}
 					}
 				}
 				
@@ -95,6 +101,9 @@ class Task_Grab_Ratings extends \app\Task_Base
 				$comments = $det->innertext;
 				if (!empty($comments)) {
 					\app\Model_Item::update_comments($entry['id'],$comments);
+					if ($this->get('verbose', null) == 'on') {
+						$this->writer->printf('status','+', 'Updated comments for .... '.$entry['item'])->eol();
+					}
 				}
 			}
 			
@@ -104,6 +113,10 @@ class Task_Grab_Ratings extends \app\Task_Base
 				$saleslevel = $det->innertext;
 				if (!empty($saleslevel)) {
 					\app\Model_ItemAuthor::update_saleslevel($entry['userid'],$saleslevel);
+					
+					if ($this->get('verbose', null) == 'on') {
+						$this->writer->printf('status','+', 'Updated sales level for the author of .... '.$entry['item'])->eol();
+					}
 				}
 			}
 			
@@ -113,6 +126,9 @@ class Task_Grab_Ratings extends \app\Task_Base
 				$level = $det->innertext;
 				if (!empty($level)) {
 					\app\Model_ItemAuthor::update_level($entry['userid'], str_replace(' Author','',$level));
+					if ($this->get('verbose', null) == 'on') {
+						$this->writer->printf('status','+', 'Updated level to '.str_replace(' Author','',$level).' for the author of .... '.$entry['item'])->eol();
+					}
 				}
 			} else {
 				$det = $html->find('li[class*="badge-elite_author"]',0);
@@ -120,6 +136,10 @@ class Task_Grab_Ratings extends \app\Task_Base
 					$level = $det->innertext;
 					if (!empty($level)) {
 						\app\Model_ItemAuthor::update_level($entry['userid'],str_replace(' Author','',$level));
+						
+						if ($this->get('verbose', null) == 'on') {
+							$this->writer->printf('status','+', 'Updated level to '.str_replace(' Author','',$level).' for the author of .... '.$entry['item'])->eol();
+						}
 					}
 				}
 			}
@@ -129,8 +149,10 @@ class Task_Grab_Ratings extends \app\Task_Base
 			//wait every 30 items
 			if ($counter % 30 == 0)
 			{
-				//$this->writer->printf('status','#', 'Waiting 5 seconds .... ')->eol();
-				\sleep(5);
+				if ($this->get('verbose', null) == 'on') {
+					$this->writer->printf('status','#', 'Waiting 3 seconds .... ')->eol();
+				}
+				\sleep(3);
 			}
 		}
 	}
@@ -157,7 +179,9 @@ class Task_Grab_Ratings extends \app\Task_Base
 	
 	function run()
 	{
-		//\app\Task::consolewriter($this->writer);
+		if ($this->get('verbose', null) == 'on') {
+			\app\Task::consolewriter($this->writer);
+		}
 		
 		$target = \app\SQLDatabase::instance(); // default database
 		
