@@ -31,13 +31,9 @@ class Task_Grab_Ratings extends \app\Task_Base
 				$this->writer->printf('status','+', 'Working on .... '.$entry['url'])->eol();
 			}
 			// Retrieve the DOM from the current URL
-			try {
-				$html = \file_get_html($entry['url']);
-			} catch (Exception $e) {
-				echo 'Caught exception: ',  $e->getMessage(), "\n";
-			}
+			$html = \file_get_html($entry['url']);
 			
-			if (isset($html) && !empty($html)) {
+			if (!empty($html) && $html !== false) {
 			
 				$det = $html->find('meta[itemprop="ratingValue"]',0);
 				if (!empty($det)) {
@@ -150,6 +146,8 @@ class Task_Grab_Ratings extends \app\Task_Base
 					}
 				}
 			
+			} else {
+				$this->writer->printf('status','*', 'Error on fetching url (maybe not found) .... '.$entry['item'])->eol();
 			}
 			
 			$counter++;
