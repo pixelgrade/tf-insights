@@ -131,7 +131,7 @@ class Model_Item
 						LEFT OUTER
 							JOIN (SELECT * FROM (SELECT *  FROM `'.static::stats_table().'` ORDER BY timestamp DESC) as sl  GROUP BY itemid ORDER BY sales DESC) as stats
 							ON stats.itemid = items.id 
-						INNDER 
+						INNER 
 							JOIN `'.static::ratings_table().'` ratings
 							ON ratings.itemid = items.id
 						LEFT OUTER

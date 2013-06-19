@@ -28,6 +28,10 @@
 						'base/foundation',
 						'login'
 					),
+				'exception-Unknown' => array
+					(
+						'errors/unknown'
+					),
 			),
 
 	); # theme
