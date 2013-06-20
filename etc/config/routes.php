@@ -19,4 +19,7 @@ return array
 		'/api/v1/items'
 			=> [ 'v1-items.api', [], $apimethods],
 	
+		'/api/v1/authors'
+			=> [ 'v1-authors.api', [], $apimethods],
+	
 	);

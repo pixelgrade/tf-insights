@@ -23,7 +23,8 @@
 				(
 					Allow::relays
 						(
-							'v1-items.api'
+							'v1-items.api',
+							'v1-authors.api'
 						)
 						->unrestricted(),
 				),

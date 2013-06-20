@@ -125,6 +125,52 @@ class Model_Item
 						ratings.votes2stars,
 						ratings.votes3stars,
 						ratings.votes4stars,
+						ratings.votes5stars,
+						author.username,
+						author.country,
+						author.level,
+						stats.timestamp as timestamp
+						
+						FROM :table items
+						LEFT OUTER
+							JOIN (SELECT * FROM (SELECT *  FROM `'.static::stats_table().'` ORDER BY timestamp DESC) as sl  GROUP BY itemid ORDER BY sales DESC) as stats
+							ON stats.itemid = items.id 
+						LEFT OUTER 
+							JOIN `'.static::ratings_table().'` ratings
+							ON ratings.itemid = items.id
+						LEFT OUTER
+							JOIN `'.static::category_table().'` category
+							ON category.id = items.category
+						LEFT OUTER
+							JOIN `'.static::author_table().'` author
+							ON author.id = items.userid
+				',
+				'mysql'
+			)
+			->key(__CLASS__.'_'.__FUNCTION__)
+			->page($page, $limit, $offset)
+			->order($order)
+			->constraints($constraints)
+			->fetch_all(static::$field_format);
+	}
+	
+	static function get_item_stats($id)
+	{		
+		return static::stash
+			(
+				__METHOD__,
+				'
+					SELECT 
+						items.*,
+						category.title as category_name,
+						category.slug as category_slug,
+						stats.sales as sales,
+						ratings.rating,
+						ratings.votes,
+						ratings.votes1stars,
+						ratings.votes2stars,
+						ratings.votes3stars,
+						ratings.votes4stars,
 						ratings.votes5stars
 						
 						FROM :table items
@@ -141,10 +187,63 @@ class Model_Item
 				'mysql'
 			)
 			->key(__CLASS__.'_'.__FUNCTION__)
-			->page($page, $limit, $offset)
-			->order($order)
-			->constraints($constraints)
+			->page(1, 1, 0)
+			->constraints(['items.id' => $id])
 			->fetch_all(static::$field_format);
+	}
+	
+	static function get_total_stats($constraints = [])
+	{		
+		return static::stash
+			(
+				__METHOD__,
+				'
+					SELECT 
+						SUM(items.comments) as comments,
+						SUM(stats.sales) as sales,
+						SUM(ratings.rating) as rating,
+						SUM(ratings.votes) as votes,
+						SUM(ratings.votes1stars) as votes1stars,
+						SUM(ratings.votes2stars) as votes2stars,
+						SUM(ratings.votes3stars) as votes3stars,
+						SUM(ratings.votes4stars) as votes4stars,
+						SUM(ratings.votes5stars) as votes5stars
+						
+						FROM :table items
+						LEFT OUTER
+							JOIN (SELECT * FROM (SELECT *  FROM `'.static::stats_table().'` ORDER BY timestamp DESC) as sl  GROUP BY itemid ORDER BY sales DESC) as stats
+							ON stats.itemid = items.id 
+						INNER 
+							JOIN `'.static::ratings_table().'` ratings
+							ON ratings.itemid = items.id
+						LEFT OUTER
+							JOIN `'.static::category_table().'` category
+							ON category.id = items.category
+				',
+				'mysql'
+			)
+			->key(__CLASS__.'_'.__FUNCTION__)
+			->page(1, 9999999, 0)
+			->constraints($constraints)
+			->fetch_entry(static::$field_format);
+	}
+	
+	static function get_common_day_for_acceptance()
+	{		
+		return static::statement
+			(
+				__METHOD__,
+				'
+					SELECT WEEKDAY(uploaded_on) AS day, COUNT(*) AS count
+					FROM `'.static::table().'`
+					GROUP BY day
+					ORDER BY count DESC
+					LIMIT 1
+				',
+				'mysql'
+			)
+			->run()
+			->fetch_entry();
 	}
 
 	// -------------------------------------------------------------------------

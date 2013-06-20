@@ -147,7 +147,9 @@ class Task_Grab_Ratings extends \app\Task_Base
 				}
 			
 			} else {
-				$this->writer->printf('status','*', 'Error on fetching url (maybe not found) .... '.$entry['item'])->eol();
+				if ($this->get('verbose', null) == 'on') {
+					$this->writer->printf('status','*', 'Error on fetching url (maybe not found) .... '.$entry['item'])->eol();
+				}
 			}
 			
 			$counter++;

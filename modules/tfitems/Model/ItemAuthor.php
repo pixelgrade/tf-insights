@@ -33,6 +33,19 @@ class Model_ItemAuthor
 				
 				),
 		);
+	
+	/**
+	 * @var array
+	 */
+	protected static $field_format = [];
+	
+	/**
+	 * @return string table
+	 */
+	static function items_table()
+	{
+		return \app\Model_Item::table();
+	}
 
 	/**
 	 * @return string table
@@ -64,7 +77,7 @@ class Model_ItemAuthor
 	
 	static function process(array $fields)
 	{
-		static::inserter($fields, static::$fieldlist['strs'], static::$fieldlist['bools'], static::$fieldlist['nums'])->run();
+		static::inserter($fields, ['username', 'country', 'location','image'], static::$fieldlist['bools'], static::$fieldlist['nums'])->run();
 		static::$last_inserted_id = \app\SQL::last_inserted_id();
 		
 		return static::$last_inserted_id;
@@ -127,6 +140,68 @@ class Model_ItemAuthor
 		
 		return $entry;
 	
+	}
+
+	static function get_authors_stats($page=1, $limit=100, $offset = 0, $order = ['sales' => 'DESC'], $constraints = [])
+	{		
+		return static::statement
+			(
+				__METHOD__,
+				'
+					SELECT 
+						authors.*,
+						stats.income as income
+						
+						FROM :table authors
+						LEFT OUTER
+							JOIN (
+								SELECT
+									items.userid as userid,
+									SUM(items.cost * stats2.sales) as income
+
+									FROM `'.static::items_table().'` items
+									LEFT OUTER
+										JOIN (SELECT * FROM (SELECT *  FROM `'.static::stats_table().'` ORDER BY timestamp DESC) as sl  GROUP BY itemid ORDER BY sales DESC) stats2
+										ON stats2.itemid = items.id
+									GROUP BY userid
+							) stats
+							ON stats.userid = authors.id
+				',
+				'mysql'
+			)
+			->run()
+			->fetch_all(static::$field_format);
+	}
+	
+	static function get_author_stats($id)
+	{		
+		return static::stash
+			(
+				__METHOD__,
+				'
+					SELECT 
+						authors.*,
+						stats.income as income
+						
+						FROM :table authors
+						LEFT OUTER
+							JOIN (
+							SELECT
+								(items.cost * stats2.sales) as income
+								
+								FROM `'.static::items_table().'` items
+								LEFT OUTER
+									JOIN (SELECT * FROM (SELECT *  FROM `'.static::stats_table().'` ORDER BY timestamp DESC) as sl  GROUP BY itemid ORDER BY sales DESC) as stats2
+									ON stats2.itemid = items.id
+							) as stats
+							ON stats.userid = authors.id
+				',
+				'mysql'
+			)
+			->key(__CLASS__.'_'.__FUNCTION__)
+			->page(1, 1, 0)
+			->constraints(['authors.id' => $id])
+			->fetch_all(static::$field_format);
 	}
 
 	// -------------------------------------------------------------------------
