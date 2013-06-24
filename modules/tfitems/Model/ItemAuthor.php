@@ -143,34 +143,82 @@ class Model_ItemAuthor
 	}
 
 	static function get_authors_stats($page=1, $limit=100, $offset = 0, $order = ['sales' => 'DESC'], $constraints = [])
-	{		
-		return static::statement
-			(
-				__METHOD__,
-				'
-					SELECT 
-						authors.*,
-						stats.income as income
-						
-						FROM :table authors
-						LEFT OUTER
-							JOIN (
-								SELECT
-									items.userid as userid,
-									SUM(items.cost * stats2.sales) as income
+	{
+		if (empty($constraints['date'])) {
+			return static::statement
+				(
+					__METHOD__,
+					'
+						SELECT 
+							authors.id,
+							authors.username,
+							authors.country,
+							authors.level,
+							authors.saleslevel,
+							authors.location,
+							authors.image,
+							authors.followers,
+							stats.income as income,
+							stats.sales as sales
 
-									FROM `'.static::items_table().'` items
-									LEFT OUTER
-										JOIN (SELECT * FROM (SELECT *  FROM `'.static::stats_table().'` ORDER BY timestamp DESC) as sl  GROUP BY itemid ORDER BY sales DESC) stats2
-										ON stats2.itemid = items.id
-									GROUP BY userid
-							) stats
-							ON stats.userid = authors.id
-				',
-				'mysql'
-			)
-			->run()
-			->fetch_all(static::$field_format);
+							FROM :table authors
+							LEFT OUTER
+								JOIN (
+									SELECT
+										items.userid as userid,
+										SUM(stats2.sales) as sales,
+										SUM(items.cost * stats2.sales) as income
+
+										FROM `'.static::items_table().'` items
+										LEFT OUTER
+											JOIN (SELECT * FROM (SELECT *  FROM `'.static::stats_table().'` ORDER BY timestamp DESC) as sl  GROUP BY itemid ORDER BY sales DESC) stats2
+											ON stats2.itemid = items.id
+										GROUP BY userid
+								) stats
+								ON stats.userid = authors.id
+					',
+					'mysql'
+				)
+				->run()
+				->fetch_all(static::$field_format);
+		} else {
+			return static::statement
+				(
+					__METHOD__,
+					'
+						SELECT 
+							authors.id,
+							authors.username,
+							authors.country,
+							authors.level,
+							authors.saleslevel,
+							authors.location,
+							authors.image,
+							authors.followers,
+							stats.income as income,
+							stats.sales as sales
+
+							FROM :table authors
+							LEFT OUTER
+								JOIN (
+									SELECT
+										items.userid as userid,
+										SUM(stats2.sales) as sales,
+										SUM(items.cost * stats2.sales) as income
+
+										FROM `'.static::items_table().'` items
+										LEFT OUTER
+											JOIN (SELECT * FROM (SELECT *  FROM `'.static::stats_table().'` WHERE DATE(timestamp) <= DATE(FROM_UNIXTIME('.$constraints['date'].')) ORDER BY timestamp DESC) as sl  GROUP BY itemid ORDER BY sales DESC) stats2
+											ON stats2.itemid = items.id
+										GROUP BY userid
+								) stats
+								ON stats.userid = authors.id
+					',
+					'mysql'
+				)
+				->run()
+				->fetch_all(static::$field_format);
+		}
 	}
 	
 	static function get_author_stats($id)

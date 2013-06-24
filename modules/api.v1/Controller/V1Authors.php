@@ -55,6 +55,12 @@ class Controller_V1Authors extends \app\Controller_Base_V1Api
 			$conf['limit'] = 9999999;
 		}
 		
+		$date = false;
+			
+		if (isset($req['date'])) {
+			$conf['constraints']['date'] = $req['date'];
+		}
+		
 		//get a single author
 		if (isset($req['userid'])) {
 			return \app\Model_ItemAuthor::get_author_stats($req['userid']);
