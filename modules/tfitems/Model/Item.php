@@ -154,42 +154,80 @@ class Model_Item
 			->fetch_all(static::$field_format);
 	}
 	
-	static function get_item_stats($id)
-	{		
-		return static::stash
-			(
-				__METHOD__,
-				'
-					SELECT 
-						items.*,
-						category.title as category_name,
-						category.slug as category_slug,
-						stats.sales as sales,
-						ratings.rating,
-						ratings.votes,
-						ratings.votes1stars,
-						ratings.votes2stars,
-						ratings.votes3stars,
-						ratings.votes4stars,
-						ratings.votes5stars
-						
-						FROM :table items
-						LEFT OUTER
-							JOIN (SELECT * FROM (SELECT *  FROM `'.static::stats_table().'` ORDER BY timestamp DESC) as sl  GROUP BY itemid ORDER BY sales DESC) as stats
-							ON stats.itemid = items.id 
-						INNER 
-							JOIN `'.static::ratings_table().'` ratings
-							ON ratings.itemid = items.id
-						LEFT OUTER
-							JOIN `'.static::category_table().'` category
-							ON category.id = items.category
-				',
-				'mysql'
-			)
-			->key(__CLASS__.'_'.__FUNCTION__)
-			->page(1, 1, 0)
-			->constraints(['items.id' => $id])
-			->fetch_all(static::$field_format);
+	static function get_item_stats($id, $date = false)
+	{
+		if (!$date) {
+			return static::stash
+				(
+					__METHOD__,
+					'
+						SELECT 
+							items.*,
+							category.title as category_name,
+							category.slug as category_slug,
+							stats.sales as sales,
+							ratings.rating,
+							ratings.votes,
+							ratings.votes1stars,
+							ratings.votes2stars,
+							ratings.votes3stars,
+							ratings.votes4stars,
+							ratings.votes5stars
+
+							FROM :table items
+							LEFT OUTER
+								JOIN (SELECT * FROM (SELECT *  FROM `'.static::stats_table().'` ORDER BY timestamp DESC) as sl  GROUP BY itemid ORDER BY sales DESC) as stats
+								ON stats.itemid = items.id 
+							INNER 
+								JOIN `'.static::ratings_table().'` ratings
+								ON ratings.itemid = items.id
+							LEFT OUTER
+								JOIN `'.static::category_table().'` category
+								ON category.id = items.category
+					',
+					'mysql'
+				)
+				->key(__CLASS__.'_'.__FUNCTION__)
+				->page(1, 1, 0)
+				->constraints(['items.id' => $id])
+				->fetch_entry(static::$field_format);
+		} else {
+			//we need to get the sales from a certain date
+			return static::stash
+				(
+					__METHOD__,
+					'
+						SELECT 
+							items.*,
+							category.title as category_name,
+							category.slug as category_slug,
+							stats.sales as sales,
+							ratings.rating,
+							ratings.votes,
+							ratings.votes1stars,
+							ratings.votes2stars,
+							ratings.votes3stars,
+							ratings.votes4stars,
+							ratings.votes5stars
+
+							FROM :table items
+							LEFT OUTER
+								JOIN (SELECT * FROM (SELECT *  FROM `'.static::stats_table().'` WHERE DATE(timestamp) <= DATE(FROM_UNIXTIME('.$date.')) ORDER BY timestamp DESC ) as sl  GROUP BY itemid ORDER BY sales DESC) as stats
+								ON stats.itemid = items.id 
+							INNER 
+								JOIN `'.static::ratings_table().'` ratings
+								ON ratings.itemid = items.id
+							LEFT OUTER
+								JOIN `'.static::category_table().'` category
+								ON category.id = items.category
+					',
+					'mysql'
+				)
+				->key(__CLASS__.'_'.__FUNCTION__)
+				->page(1, 1, 0)
+				->constraints(['items.id' => $id])
+				->fetch_entry(static::$field_format);
+		}
 	}
 	
 	static function get_total_stats($constraints = [])

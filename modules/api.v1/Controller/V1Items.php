@@ -55,28 +55,6 @@ class Controller_V1Items extends \app\Controller_Base_V1Api
 			$conf['limit'] = 9999999;
 		}
 		
-		//get a single item
-		if (isset($req['itemid'])) {
-			return \app\Model_Item::get_item_stats($req['itemid']);
-		}
-		
-		//get a totals
-		if (isset($req['totals']))
-		{
-			$constraints = [];
-			
-			if (isset($req['cost'])) {
-				$constraints['cost'] = $req['cost'];
-			}
-			
-			return \app\Model_Item::get_total_stats($constraints);
-		}
-		
-		//get common acceptance day
-		if (isset($req['common_acceptance_day'])) {
-			return \app\Model_Item::get_common_day_for_acceptance();
-		}
-		
 		//get entries stats for a given period of days
 		if (isset($req['period'])) {
 			//$conf['constraints']['datetime'] = ['between' => [$start, $end]];
@@ -85,6 +63,31 @@ class Controller_V1Items extends \app\Controller_Base_V1Api
 		//get items accepted in the last n days
 		if (isset($req['accepted'])) {
 			$conf['constraints']['items.uploaded_on'] = array('between' => array(date('Y-m-d', strtotime("now -".$req['accepted']." days")), date('Y-m-d', strtotime("now"))));
+		}
+		
+		//get a single item
+		if (isset($req['itemid'])) {
+			$date = false;
+			
+			if (isset($req['date'])) {
+				$date = $req['date'];
+			}
+			return \app\Model_Item::get_item_stats($req['itemid'], $date);
+		}
+		
+		//get common acceptance day
+		if (isset($req['common_acceptance_day'])) {
+			return \app\Model_Item::get_common_day_for_acceptance();
+		}
+		
+		//get a totals
+		if (isset($req['totals']))
+		{			
+			if (isset($req['cost'])) {
+				$conf['constraints']['cost'] = $req['cost'];
+			}
+			
+			return \app\Model_Item::get_total_stats($conf['constraints']);
 		}
 
 		//get all the items info, paged
