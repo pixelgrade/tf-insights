@@ -69,7 +69,7 @@ class Model_ItemStats
 	// ------------------------------------------------------------------------
 	// Collection
 
-	static function get_item_sales($id, $constraints)
+	static function get_item_sales($id, $constraints = [])
 	{
 		$order = ['timestamp'=>'ASC'];
 		return static::stash
