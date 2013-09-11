@@ -85,7 +85,8 @@ class Model_ItemStats
 				'mysql'
 			)
 			->key(__CLASS__.'_'.__FUNCTION__)
-			->page(1, 9999, 0)
+			->page(1, 99999, 0)
+			->order(['timestamp'=>'ASC'])
 			->constraints($constraints)
 			->fetch_all(static::$field_format);
 	}
