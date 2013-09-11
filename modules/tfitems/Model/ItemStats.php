@@ -74,7 +74,7 @@ class Model_ItemStats
 						sales,
 						timestamp
 						
-						FROM :table stats
+						FROM :table
 				',
 				'mysql'
 			)
