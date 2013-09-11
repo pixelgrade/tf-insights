@@ -33,6 +33,11 @@ class Model_ItemStats
 				
 				),
 		);
+	
+	/**
+	 * @var array
+	 */
+	protected static $field_format = [];
 
 	/**
 	 * @return string table
