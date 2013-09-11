@@ -76,6 +76,7 @@ class Model_ItemStats
 				__METHOD__,
 				'
 					SELECT
+						itemid,
 						sales,
 						timestamp
 						
