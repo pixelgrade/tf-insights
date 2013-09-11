@@ -64,7 +64,25 @@ class Model_ItemStats
 	// ------------------------------------------------------------------------
 	// Collection
 
-	
+	static function get_item_sales($id, $constraints)
+	{		
+		return static::stash
+			(
+				__METHOD__,
+				'
+					SELECT
+						stats.sales as sales
+						stats.timestamp as timestamp
+						
+						FROM :table stats
+				',
+				'mysql'
+			)
+			->key(__CLASS__.'_'.__FUNCTION__)
+			->page(1, 9999, 0)
+			->constraints($constraints)
+			->fetch_all(static::$field_format);
+	}
 
 	// -------------------------------------------------------------------------
 	// Extended
