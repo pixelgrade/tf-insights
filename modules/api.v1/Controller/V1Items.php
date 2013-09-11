@@ -56,15 +56,12 @@ class Controller_V1Items extends \app\Controller_Base_V1Api
 		}
 		
 		//get entries stats for a given period of days
-		if (isset($req['period'])) {
+		if (isset($req['period']) && isset($req['itemid'])) {
 			$start = strtotime('-'.$req['period'].' day');
 			$end = time();
-			$conf['constraints']['items.timestamp'] = array('between' => array($start, $end));
-			
-			if (isset($req['itemid'])) {
-				$conf['constraints']['items.id'] = $req['itemid'];
-				return \app\Model_ItemStats::get_item_sales($req['itemid'], $conf['constraints']);
-			}
+			$conf['constraints']['timestamp'] = array('between' => array($start, $end));
+			$conf['constraints']['id'] = $req['itemid'];
+			return \app\Model_ItemStats::get_item_sales($req['itemid'], $conf['constraints']);
 		}
 		
 		//get items accepted in the last n days

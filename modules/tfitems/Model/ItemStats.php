@@ -71,8 +71,8 @@ class Model_ItemStats
 				__METHOD__,
 				'
 					SELECT
-						stats.sales as sales
-						stats.timestamp as timestamp
+						sales,
+						timestamp
 						
 						FROM :table stats
 				',
