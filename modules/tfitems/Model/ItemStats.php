@@ -91,6 +91,34 @@ class Model_ItemStats
 			->constraints($constraints)
 			->fetch_all(static::$field_format);
 	}
+	
+	static function get_items_sales($date)
+	{		
+		if (!date) {
+			//we need to grab all
+		} else {
+			return static::stash
+				(
+					__METHOD__,
+					'
+						SELECT
+							itemid,
+							sales,
+							timestamp
+
+							FROM :table
+							
+							WHERE DATE(timestamp) <= DATE(FROM_UNIXTIME('.$date.')
+							
+							GROUP BY itemid ORDER BY sales DESC
+					',
+					'mysql'
+				)
+				->key(__CLASS__.'_'.__FUNCTION__)
+				->page(1, 99999, 0)
+				->fetch_all(static::$field_format);
+		}
+	}
 
 	// -------------------------------------------------------------------------
 	// Extended

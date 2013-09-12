@@ -93,6 +93,17 @@ class Controller_V1Items extends \app\Controller_Base_V1Api
 			
 			return \app\Model_Item::get_total_stats($conf['constraints']);
 		}
+		
+		//get sales for all items at a certain date
+		if (isset($req['salesonly'])) {
+			$date = false;
+			
+			if (isset($req['date'])) {
+				$date = $req['date'];
+			}
+			
+			return \app\Model_ItemStats::get_items_sales($date);
+		}
 
 		//get all the items info, paged
 		return \app\Model_Item::get_items_stats($conf['page'], $conf['limit'], $conf['offset'],$conf['order'],$conf['constraints']);
