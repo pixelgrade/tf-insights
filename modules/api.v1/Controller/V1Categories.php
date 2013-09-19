@@ -17,38 +17,17 @@ class Controller_V1Categories extends \app\Controller_Base_V1Api
 	 */
 	function get($req)
 	{
-		if (! isset($req['page']))
-		{
-			$conf['page'] = 1;
-		}
-		else
-		{
-			$conf['page'] = $req['page'];
-		}
-
-		if (! isset($req['limit']))
-		{
-			$conf['limit'] = 100;
-		}
-		else
-		{
-			$conf['limit'] = $req['limit'];
-		}
-
-		if (! isset($req['offset']))
-		{
-			$conf['offset'] = 0;
-		}
-		else
-		{
-			$conf['offset'] = $req['offset'];
-		}
-
 		if (isset($req['all']))
 		{
-			$conf['page'] = null;
-			$conf['limit'] = null;
-			$conf['offset'] = 0;
+			$page = null;
+			$limit = null;
+			$offset = 0;
+		}
+		else # limited
+		{
+			$page = isset($req['page']) ? $req['page'] : 1;
+			$limit = isset($req['limit']) ? $req['limit'] : 100;
+			$offset = isset($req['offset']) ? $req['offset'] : 0;
 		}
 
 		return \app\Model_ItemCategory::entries($page, $limit, $offset);
