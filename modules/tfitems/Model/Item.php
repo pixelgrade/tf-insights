@@ -17,7 +17,7 @@ class Model_Item
 	 * @var string
 	 */
 	protected static $table = 'pxg_items';
-	
+
 	protected static $fieldlist = array
 		(
 			'nums' => array
@@ -30,10 +30,10 @@ class Model_Item
 				),
 			'bools' => array
 				(
-				
+
 				),
 		);
-	
+
 	/**
 	 * @var array
 	 */
@@ -46,7 +46,7 @@ class Model_Item
 	{
 		return \app\Model_ItemCategory::table();
 	}
-	
+
 	/**
 	 * @return string table
 	 */
@@ -54,7 +54,7 @@ class Model_Item
 	{
 		return \app\Model_ItemAuthor::table();
 	}
-	
+
 	/**
 	 * @return string table
 	 */
@@ -62,7 +62,7 @@ class Model_Item
 	{
 		return \app\Model_ItemStats::table();
 	}
-	
+
 	/**
 	 * @return string table
 	 */
@@ -73,7 +73,7 @@ class Model_Item
 
 	// -------------------------------------------------------------------------
 	// factory interface
-	
+
 	/**
 	 * @return \app\Validator
 	 */
@@ -82,24 +82,24 @@ class Model_Item
 		return \app\Validator::instance($fields)
 			->rule(['cost','rating','item', 'url', 'live_preview_url', 'thumbnail', 'tags', 'uploaded_on', 'last_update'], 'not_empty');
 	}
-	
+
 	static function process(array $fields)
 	{
 		static::inserter($fields, static::$fieldlist['strs'], static::$fieldlist['bools'], static::$fieldlist['nums'])->run();
 		static::$last_inserted_id = \app\SQL::last_inserted_id();
-		
+
 		return static::$last_inserted_id;
 	}
-	
+
 	/**
-	 * Update 
+	 * Update
 	 */
 	static function update_process($id, array $fields)
 	{
 		static::updater($id, $fields, static::$fieldlist['strs'], static::$fieldlist['bools'], ['cost', 'rating'])->run();
 		static::clear_entry_cache($id);
 	}
-	
+
 	static function update_comments($id, $comments) {
 		static::updater($id, ['comments' => $comments], [], [], ['comments'])->run();
 		static::clear_entry_cache($id);
@@ -109,12 +109,12 @@ class Model_Item
 	// Collection
 
 	static function get_items_stats($page=1, $limit=100, $offset = 0, $order = ['sales' => 'DESC'], $constraints = [])
-	{		
-		return static::stash
+	{
+		$items = static::stash
 			(
 				__METHOD__,
 				'
-					SELECT 
+					SELECT
 						items.*,
 						category.title as category_name,
 						category.slug as category_slug,
@@ -130,12 +130,12 @@ class Model_Item
 						author.country,
 						author.level,
 						stats.timestamp as timestamp
-						
+
 						FROM :table items
 						LEFT OUTER
 							JOIN (SELECT * FROM (SELECT *  FROM `'.static::stats_table().'` ORDER BY timestamp DESC) as sl  GROUP BY itemid ORDER BY sales DESC) as stats
-							ON stats.itemid = items.id 
-						LEFT OUTER 
+							ON stats.itemid = items.id
+						LEFT OUTER
 							JOIN `'.static::ratings_table().'` ratings
 							ON ratings.itemid = items.id
 						LEFT OUTER
@@ -152,16 +152,24 @@ class Model_Item
 			->order($order)
 			->constraints($constraints)
 			->fetch_all(static::$field_format);
+
+		foreach ($items as & $item)
+		{
+			$item['title'] = \preg_replace('#[-+|].*#', '', $item['item']);
+		}
+
+		return $items;
 	}
-	
+
 	static function get_item_stats($id, $date = false)
 	{
-		if (!$date) {
-			return static::stash
+		if ( ! $date)
+		{
+			$item = static::stash
 				(
 					__METHOD__,
 					'
-						SELECT 
+						SELECT
 							items.*,
 							category.title as category_name,
 							category.slug as category_slug,
@@ -177,8 +185,8 @@ class Model_Item
 							FROM :table items
 							LEFT OUTER
 								JOIN (SELECT * FROM (SELECT *  FROM `'.static::stats_table().'` ORDER BY timestamp DESC) as sl  GROUP BY itemid ORDER BY sales DESC) as stats
-								ON stats.itemid = items.id 
-							INNER 
+								ON stats.itemid = items.id
+							INNER
 								JOIN `'.static::ratings_table().'` ratings
 								ON ratings.itemid = items.id
 							LEFT OUTER
@@ -191,13 +199,15 @@ class Model_Item
 				->page(1, 1, 0)
 				->constraints(['items.id' => $id])
 				->fetch_entry(static::$field_format);
-		} else {
+		}
+		else # not date
+		{
 			//we need to get the sales from a certain date
-			return static::stash
+			$items = static::stash
 				(
 					__METHOD__,
 					'
-						SELECT 
+						SELECT
 							items.*,
 							category.title as category_name,
 							category.slug as category_slug,
@@ -213,8 +223,8 @@ class Model_Item
 							FROM :table items
 							LEFT OUTER
 								JOIN (SELECT * FROM (SELECT *  FROM `'.static::stats_table().'` WHERE DATE(timestamp) <= DATE(FROM_UNIXTIME('.$date.')) ORDER BY timestamp DESC ) as sl  GROUP BY itemid ORDER BY sales DESC) as stats
-								ON stats.itemid = items.id 
-							INNER 
+								ON stats.itemid = items.id
+							INNER
 								JOIN `'.static::ratings_table().'` ratings
 								ON ratings.itemid = items.id
 							LEFT OUTER
@@ -228,15 +238,22 @@ class Model_Item
 				->constraints(['items.id' => $id])
 				->fetch_entry(static::$field_format);
 		}
+
+		foreach ($items as & $item)
+		{
+			$item['title'] = \preg_replace('#[-+|].*#', '', $item['item']);
+		}
+
+		return $items;
 	}
-	
+
 	static function get_total_stats($constraints = [])
-	{		
+	{
 		return static::stash
 			(
 				__METHOD__,
 				'
-					SELECT 
+					SELECT
 						SUM(items.comments) as comments,
 						SUM(stats.sales) as sales,
 						SUM(ratings.rating) as rating,
@@ -246,12 +263,12 @@ class Model_Item
 						SUM(ratings.votes3stars) as votes3stars,
 						SUM(ratings.votes4stars) as votes4stars,
 						SUM(ratings.votes5stars) as votes5stars
-						
+
 						FROM :table items
 						LEFT OUTER
 							JOIN (SELECT * FROM (SELECT *  FROM `'.static::stats_table().'` ORDER BY timestamp DESC) as sl  GROUP BY itemid ORDER BY sales DESC) as stats
-							ON stats.itemid = items.id 
-						INNER 
+							ON stats.itemid = items.id
+						INNER
 							JOIN `'.static::ratings_table().'` ratings
 							ON ratings.itemid = items.id
 						LEFT OUTER
@@ -265,9 +282,9 @@ class Model_Item
 			->constraints($constraints)
 			->fetch_entry(static::$field_format);
 	}
-	
+
 	static function get_common_day_for_acceptance()
-	{		
+	{
 		return static::statement
 			(
 				__METHOD__,
