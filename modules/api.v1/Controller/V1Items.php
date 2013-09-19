@@ -118,6 +118,7 @@ class Controller_V1Items extends \app\Controller_Base_V1Api
 			$start = date('Y-m-d',strtotime('-'.$req['dayspast'].' day'));
 			$end = date('Y-m-d',time());
 			$conf['constraints']['items.uploaded_on'] = array('between' => array($start, $end));
+			$conf['order']['stats.sales'] = 'desc';
 		}
 
 		//get all the items info, paged
