@@ -117,7 +117,7 @@ class Controller_V1Items extends \app\Controller_Base_V1Api
 		{
 			$start = date('Y-m-d',strtotime('-'.$req['dayspast'].' day'));
 			$end = date('Y-m-d',time());
-			$conf['constraints']['timestamp'] = array('between' => array($start, $end));
+			$conf['constraints']['items.timestamp'] = array('between' => array($start, $end));
 		}
 
 		//get all the items info, paged
