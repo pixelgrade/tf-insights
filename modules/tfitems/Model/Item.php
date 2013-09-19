@@ -153,10 +153,7 @@ class Model_Item
 			->constraints($constraints)
 			->fetch_all(static::$field_format);
 
-		foreach ($items as & $item)
-		{
-			$item['title'] = \preg_replace('#[-+|].*#', '', $item['item']);
-		}
+		static::parse_title($items);
 
 		return $items;
 	}
@@ -239,10 +236,7 @@ class Model_Item
 				->fetch_entry(static::$field_format);
 		}
 
-		foreach ($items as & $item)
-		{
-			$item['title'] = \preg_replace('#[-+|].*#', '', $item['item']);
-		}
+		static::parse_title($items);
 
 		return $items;
 	}
@@ -304,6 +298,16 @@ class Model_Item
 	// -------------------------------------------------------------------------
 	// Extended
 
+	/**
+	 * Generates title attribute on items using "item" attribute.
+	 */
+	static function parse_title( & $items)
+	{
+		foreach ($items as & $item)
+		{
+			$item['title'] = \trim(\preg_replace('#([-+|/:]|" WP").*#', '', $item['item']));
+		}
+	}
 
 } # class
 
